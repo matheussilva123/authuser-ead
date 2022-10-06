@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User save(UserDTO userDTO) {
+    public User save(final UserDTO userDTO) {
         if (checkUsernameExists(userDTO.getUsername())) {
             throw new UsernameAlreadyExistsException("This username already exists.");
         }
@@ -58,6 +58,37 @@ public class UserServiceImpl implements UserService {
         user.setCreatedAt(LocalDateTime.now(ZoneId.of("UTC")));
         user.setUpdatedAt(LocalDateTime.now(ZoneId.of("UTC")));
         return userRepository.save(user);
+    }
+
+    @Override
+    public User updateUser(final UserDTO userDTO, final UUID userId) {
+        var user = findById(userId);
+        user.setFullName(userDTO.getFullName());
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        user.setCpf(userDTO.getCpf());
+        user.setUpdatedAt(LocalDateTime.now(ZoneId.of("UTC")));
+
+        return userRepository.save(user);
+    }
+
+    @Override
+    public void updatePassword(final UserDTO userDTO, final UUID userId) {
+        var user = findById(userId);
+        if(user.getPassword().equals(userDTO.getOldPassword())) {
+            user.setUpdatedAt(LocalDateTime.now(ZoneId.of("UTC")));
+            user.setPassword(userDTO.getPassword());
+            userRepository.save(user);
+        } else {
+            throw new IllegalArgumentException("Error: Mismatched old password!");
+        }
+    }
+
+    @Override
+    public void updateOrCreateImage(final UserDTO userDTO, final UUID userId) {
+        var user = findById(userId);
+        user.setImageUrl(userDTO.getImageUrl());
+        user.setUpdatedAt(LocalDateTime.now(ZoneId.of("UTC")));
+        userRepository.save(user);
     }
 
     private boolean checkUsernameExists(final String username) {

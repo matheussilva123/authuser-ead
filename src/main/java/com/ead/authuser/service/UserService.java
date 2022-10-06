@@ -14,4 +14,10 @@ public interface UserService {
     void delete(UUID userId);
 
     User save(UserDTO userDTO);
+
+    User updateUser(UserDTO userDTO, final UUID userId);
+
+    void updatePassword(UserDTO userDTO, final UUID userId);
+
+    void updateOrCreateImage(UserDTO userDTO, final UUID userId);
 }
